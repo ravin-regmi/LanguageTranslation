@@ -89,13 +89,21 @@
                         </td>
                     </tr>
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5" class="td-fit align-middle">
+                                <div class="inline-flex text-right">
+                                    <a tabindex="0" class="btn btn-link dim cursor-pointer text-80 ml-auto mr-6" v-bind:href="'/nova/language-translation'">Cancel</a>
+                                </div>
+                                <div class="inline-flex text-right">
+                                    <button type="button" @click="saveTranslations" class="btn btn-default btn-primary inline-flex items-center relative">
+                                        <span class="">Save</span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
-                <div class="flex items-center">
-                    <a tabindex="0" class="btn btn-link dim cursor-pointer text-80 ml-auto mr-6" v-bind:href="'/nova/language-translation'">Cancel</a>
-                    <button type="button" @click="saveTranslations" class="btn btn-default btn-primary inline-flex items-center relative">
-                        <span class="">Save</span>
-                    </button>
-                </div>
             </loading-card>
         </loading-view>
     </div>
@@ -142,9 +150,11 @@
                 Nova.request().post('/nova-vendor/language-translation/translations/save-translation',
                     {translations: this.translations})
                     .then((response) => {
-                        console.log("post response = ", response);
-                        Nova.success(this.__(response.message));
-                        this.$toasted.show(response.message, { type: 'success' });
+                        if (response.data && response.data.message) {
+                            Nova.success(this.__(response.data.message));
+                        } else {
+                            Nova.error(this.__("Something went wrong!"));
+                        }
                     })
             },
             addNewTranslation(index) {
