@@ -5,6 +5,8 @@ namespace Tradein\LanguageTranslation\Http;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Request;
 
+const DEFAULT_LANG = 'fr';
+
 class TranslationController extends Controller
 {
     protected $translationFilesPath;
@@ -19,7 +21,8 @@ class TranslationController extends Controller
     {
         return response()->json([
             'translations' => $this->getAllTranslationsFromFile(),
-            'message' => 'translation data'
+            'message' => 'translation data',
+            'defaultLang' => DEFAULT_LANG
         ]);
     }
 
@@ -31,9 +34,9 @@ class TranslationController extends Controller
         }
 
         $resFr = $this->saveTranslationToFile('fr', $this->reverseKeyValueFormat($translations['fr'], 'fr'));
-        $resEn = $this->saveTranslationToFile('en', $this->reverseKeyValueFormat($translations['en']));
-        $resDe = $this->saveTranslationToFile('de', $this->reverseKeyValueFormat($translations['de']));
-        $resEs = $this->saveTranslationToFile('es', $this->reverseKeyValueFormat($translations['es']));
+        $resEn = $this->saveTranslationToFile('en', $this->reverseKeyValueFormat($translations['en'], 'en'));
+        $resDe = $this->saveTranslationToFile('de', $this->reverseKeyValueFormat($translations['de'], 'de'));
+        $resEs = $this->saveTranslationToFile('es', $this->reverseKeyValueFormat($translations['es'], 'es'));
 
         if (!$resEn || !$resFr || !$resDe || !$resEs) {
             return response()->json(['data' => [], 'message' => 'Error saving some data']);
@@ -76,7 +79,7 @@ class TranslationController extends Controller
         foreach ($data as $key => $value) {
             $tempValue = [];
             foreach ($value['value'] as $key_1 => $value_1) {
-                if ($lang == 'fr') {
+                if ($lang == DEFAULT_LANG) {
                     if ($value_1['key'] != $value_1['prevKey']) {
                         $this->keys[$value_1['prevKey']] = $value_1['key'];
                     }
@@ -92,7 +95,7 @@ class TranslationController extends Controller
         return $newData;
     }
 
-    protected function getTranslationFromFile($lang = 'fr')
+    protected function getTranslationFromFile($lang = DEFAULT_LANG)
     {
         $translation = file_get_contents($this->translationFilesPath . "/{$lang}.json");
         return json_decode($translation);
