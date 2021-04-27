@@ -137,6 +137,7 @@
                     {translations: this.translations})
                     .then((response) => {
                         console.log("post response = ", response);
+                        Nova.success(this.__(response.message))
                     })
             },
             addNewTranslation(index) {
